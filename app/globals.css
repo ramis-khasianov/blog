@@ -26,6 +26,8 @@ For example dark:bg-dark-200
   --color-light-850: #f9fbfb;
   --color-light-900: #ffffff;
 
+  --color-danger-500: #e01f2e;
+
   /* Radius */
   --radius: 0.5rem;
   --radius-sm: calc(var(--radius) - 2px);
