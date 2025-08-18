@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import PostCard from "@/components/cards/PostCard";
 import { Sun } from "lucide-react";
 import React from "react";
 
 const DesignSchema = () => {
   return (
     <div className="flex flex-col justify-center items-center gap-6">
+      {/* Buttons */}
       <div className="w-full h-full border rounded p-6">
         <div className="h2-bold mb-4">Buttons</div>
         <div className="base-regular mb-4">Various shadcn buttons</div>
@@ -20,6 +22,14 @@ const DesignSchema = () => {
           <Button size="icon">
             <Sun />
           </Button>
+        </div>
+      </div>
+      {/* Cards */}
+      <div className="w-full h-full border rounded p-6">
+        <div className="h2-bold mb-4">Cards</div>
+        <div className="base-regular mb-4">Cards from shadcn</div>
+        <div className="flex items-center justify-start gap-2 ">
+          <PostCard />
         </div>
       </div>
     </div>
