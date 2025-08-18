@@ -1,3 +1,5 @@
+"use client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import PostCard from "@/components/cards/PostCard";
 import { Sun } from "lucide-react";
@@ -30,6 +32,27 @@ const DesignSchema = () => {
         <div className="base-regular mb-4">Cards from shadcn</div>
         <div className="flex items-center justify-start gap-2 ">
           <PostCard />
+        </div>
+      </div>
+      {/* Toast */}
+      <div className="w-full h-full border rounded p-6">
+        <div className="h2-bold mb-4">Toaster (Sonner)</div>
+        <div className="base-regular mb-4">Toaster from shadcn</div>
+        <div>
+          <Button
+            variant="outline"
+            onClick={() => {
+              toast("Something happened", {
+                description: "Some extra Info",
+                action: {
+                  label: "Do something",
+                  onClick: () => console.log("Something is done"),
+                },
+              });
+            }}
+          >
+            Show Toast
+          </Button>
         </div>
       </div>
     </div>
