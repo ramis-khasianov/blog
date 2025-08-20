@@ -70,7 +70,7 @@ const SignInForm = () => {
       }
 
       toast.success("Success!", {
-        description: "You have successfully signed up",
+        description: "You have successfully signed in",
       });
 
       // Redirect to home
