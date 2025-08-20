@@ -12,7 +12,7 @@ const DesignSchema = () => {
       <div className="w-full h-full border rounded p-6">
         <div className="h2-bold mb-4">Buttons</div>
         <div className="base-regular mb-4">Various shadcn buttons</div>
-        <div className="flex items-center justify-start gap-2 ">
+        <div className="flex items-center justify-start gap-2 flex-wrap ">
           <Button>Default</Button>
           <Button variant="secondary">Secondary</Button>
           <Button variant="outline">Outline</Button>
@@ -38,12 +38,13 @@ const DesignSchema = () => {
       <div className="w-full h-full border rounded p-6">
         <div className="h2-bold mb-4">Toaster (Sonner)</div>
         <div className="base-regular mb-4">Toaster from shadcn</div>
-        <div>
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             onClick={() => {
               toast("Something happened", {
                 description: "Some extra Info",
+                position: "top-center",
                 action: {
                   label: "Do something",
                   onClick: () => console.log("Something is done"),
@@ -51,7 +52,32 @@ const DesignSchema = () => {
               });
             }}
           >
-            Show Toast
+            Toast from top with action
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              toast.success("Something Good", {
+                duration: 8000,
+                description: "Some extra Info",
+                position: "bottom-right",
+              });
+            }}
+          >
+            Long success toast from bottom right
+          </Button>
+
+          <Button
+            variant="destructive"
+            onClick={() => {
+              toast.error("Something Bad", {
+                description: "Some extra Info",
+                position: "bottom-right",
+              });
+            }}
+          >
+            Success toast from bottom right
           </Button>
         </div>
       </div>
