@@ -4,7 +4,7 @@ import GoogleAuthForm from "@/components/forms/GoogleAuthForm";
 import KeycloakAuthForm from "@/components/forms/KeycloakAuthForm";
 import SignInForm from "@/components/forms/SignInForm";
 import SignUpForm from "@/components/forms/SignUpForm";
-import { SignOutButton } from "@/components/SignOutButton";
+import UserProfile from "@/components/navbar/UserProfile";
 
 export default async function Debugging() {
   const session = await auth();
@@ -19,7 +19,7 @@ export default async function Debugging() {
         <KeycloakAuthForm className="w-60" />
         <h1>Session Debug:</h1>
         <pre>{JSON.stringify(session, null, 2)}</pre>
-        <SignOutButton className="w-60" />
+        {session?.user ? <UserProfile session={session} /> : ""}
       </div>
       <div className="w-80">
         <SignUpForm />
