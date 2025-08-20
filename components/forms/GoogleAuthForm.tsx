@@ -36,9 +36,9 @@ const GoogleAuthForm = ({ className }: { className?: string }) => {
         alt="Google Logo"
         width={20}
         height={20}
-        className="invert-colors mr-1 object-contain"
+        className="mr-1 object-contain"
       />
-      <span>Log in with Google</span>
+      <span>Sign in with Google</span>
     </Button>
   );
 };

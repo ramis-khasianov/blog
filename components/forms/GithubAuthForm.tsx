@@ -38,7 +38,7 @@ const GithubAuthForm = ({ className }: { className?: string }) => {
         height={20}
         className="invert-colors mr-1 object-contain"
       />
-      <span>Log in with GitHub</span>
+      <span>Sign in with GitHub</span>
     </Button>
   );
 };
