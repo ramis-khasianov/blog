@@ -3,6 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,123 +16,140 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SignUpSchema } from "@/lib/validations";
+import { signUpWithCredentials } from "@/lib/actions/auth.action";
+import { Loader2 } from "lucide-react";
+
+import ROUTES from "@/constants/routes";
 
 const SignUpForm = () => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
+      passwordConfirmation: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof SignUpSchema>) {
-    // TODO: Register User
-    console.log(values);
+  const isLoading = isPending || form.formState.isSubmitting;
+
+  function onSubmit(data: z.infer<typeof SignUpSchema>) {
+    form.clearErrors();
+    startTransition(async () => {
+      const res = await signUpWithCredentials(data);
+
+      if (!res.ok) {
+        // map server codes to field/root errors
+        switch (res.code) {
+          case "ALREADY_EXISTS":
+            form.setError("email", {
+              message: "An account with this email already exists.",
+            });
+            break;
+          case "INVALID_CREDENTIALS":
+            form.setError("root", { message: "Invalid email or password." });
+            break;
+          default:
+            form.setError("root", {
+              message: res.message || "Something went wrong. Try again later",
+            });
+        }
+        return;
+      }
+
+      toast.success("Success!", {
+        description: "You have successfully signed up",
+      });
+
+      // Redirect to home
+      router.push(ROUTES.HOME);
+    });
   }
 
   return (
-    <div>
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign up</CardTitle>
-          <CardDescription className="mt-2">
-            Enter your email below to login to your account
-          </CardDescription>
-          <CardAction>
-            <Link href="/sign-in">
-              <Button variant="link">Sign In</Button>
-            </Link>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="flex flex-col gap-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Your Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Your Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Submit
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button variant="outline" className="w-full">
-            <Image
-              src="/icons/google.svg"
-              alt="Google Logo"
-              width={20}
-              height={20}
-            />
-            Sign Up with Google
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="passwordConfirmation"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {form.formState.errors.root && (
+            <div className="text-sm font-medium text-danger-500">
+              {form.formState.errors.root.message}
+            </div>
+          )}
+
+          <Button disabled={isLoading} type="submit" className="w-full">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing up...
+              </>
+            ) : (
+              "Submit"
+            )}
           </Button>
-          <Button variant="outline" className="w-full">
-            <Image
-              src="/icons/github.svg"
-              alt="Github Logo"
-              width={20}
-              height={20}
-              className="invert-colors"
-            />
-            Sign Up with Github
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+        </div>
+      </form>
+    </Form>
   );
 };
 
