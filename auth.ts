@@ -5,6 +5,7 @@ import Keycloak from "next-auth/providers/keycloak";
 import Credentials from "next-auth/providers/credentials";
 import { SignInSchema } from "./lib/validations";
 import bcrypt from "bcryptjs";
+import prisma from "./lib/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
