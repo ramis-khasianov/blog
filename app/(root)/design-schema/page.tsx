@@ -49,6 +49,9 @@ const DesignSchema = () => {
                   label: "Do something",
                   onClick: () => console.log("Something is done"),
                 },
+                actionButtonStyle: {
+                  backgroundColor: "var(--color-primary-500)",
+                },
               });
             }}
           >
@@ -77,7 +80,7 @@ const DesignSchema = () => {
               });
             }}
           >
-            Success toast from bottom right
+            Failure toast from bottom right
           </Button>
         </div>
       </div>
