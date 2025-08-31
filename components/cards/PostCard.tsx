@@ -19,7 +19,7 @@ interface Props {
 }
 
 const PostCard = ({
-  post: { id, title, createdAt, content, summary, published, author },
+  post: { id, title, createdAt, summary, author },
 }: Props) => {
   return (
     <Card className="min-w-60 max-w-160">

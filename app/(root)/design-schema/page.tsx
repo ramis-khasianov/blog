@@ -1,7 +1,6 @@
 "use client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import PostCard from "@/components/cards/PostCard";
 import { Sun } from "lucide-react";
 import React from "react";
 
