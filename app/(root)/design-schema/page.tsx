@@ -30,9 +30,7 @@ const DesignSchema = () => {
       <div className="w-full h-full border rounded p-6">
         <div className="h2-bold mb-4">Cards</div>
         <div className="base-regular mb-4">Cards from shadcn</div>
-        <div className="flex items-center justify-start gap-2 ">
-          <PostCard />
-        </div>
+        <div className="flex items-center justify-start gap-2 "></div>
       </div>
       {/* Toast */}
       <div className="w-full h-full border rounded p-6">

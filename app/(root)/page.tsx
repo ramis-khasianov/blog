@@ -1,7 +1,26 @@
 import HomeFilter from "@/components/filters/HomeFilters";
 import LocalSearch from "@/components/search/LocalSearch";
+import PostCard from "@/components/cards/PostCard";
+import { posts } from "@/constants";
 
-export default function Home() {
+interface SearchParams {
+  searchParams: Promise<{ [key: string]: string }>;
+}
+
+export default async function Home({ searchParams }: SearchParams) {
+  const { query = "", filter = "" } = await searchParams;
+
+  const filteredPosts = posts.filter((post) => {
+    const matchesQuery =
+      post.title.toLowerCase().includes(query.toLowerCase()) ||
+      post.summary.toLowerCase().includes(query.toLowerCase());
+    const matchesFilter = filter
+      ? post.title.toLowerCase().includes(filter.toLowerCase()) ||
+        post.summary.toLowerCase().includes(filter.toLowerCase())
+      : true;
+    return matchesQuery && matchesFilter;
+  });
+
   return (
     <div className="flex flex-col justify-start items-center gap-8 w-full mx-auto">
       {/* Hero Section */}
@@ -29,6 +48,12 @@ export default function Home() {
 
       <div>
         <HomeFilter />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredPosts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
       </div>
     </div>
   );

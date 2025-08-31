@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   Card,
   CardAction,
@@ -9,27 +11,36 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const PostCard = () => {
+import ROUTES from "@/constants/routes";
+import { getTimeStamp } from "@/lib/utils";
+
+interface Props {
+  post: Post;
+}
+
+const PostCard = ({
+  post: { id, title, createdAt, content, summary, published, author },
+}: Props) => {
   return (
     <Card className="min-w-60 max-w-160">
       <CardHeader>
-        <CardTitle>Blog post about NextJS</CardTitle>
-        <CardDescription>by Post Author</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>published {getTimeStamp(createdAt)}</CardDescription>
         <CardAction>
-          <Button variant="link">Follow</Button>
+          <Link href={ROUTES.AUTHOR(author.id)}>
+            <Button variant="link">by {author.name}</Button>
+          </Link>
         </CardAction>
       </CardHeader>
       <CardContent>
         <p className="paragraph-regular text-dark-400 dark:text-light-500">
-          Next.js 15 introduces game-changing features that make React
-          development faster and more efficient. The new App Router brings
-          improved performance with nested layouts, while server components
-          reduce bundle sizes significantly. Learn how to migrate from Pages
-          Router and take advantage of the latest optimizations.
+          {summary}
         </p>
       </CardContent>
       <CardFooter>
-        <Button>Read</Button>
+        <Link href={ROUTES.POST(id)}>
+          <Button>Read</Button>
+        </Link>
       </CardFooter>
     </Card>
   );

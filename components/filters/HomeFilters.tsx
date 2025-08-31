@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
 const filters = [
-  { name: "Databases", value: "databases" },
+  { name: "Database", value: "database" },
   { name: "ETL", value: "etl" },
 
   { name: "AI", value: "ai" },
