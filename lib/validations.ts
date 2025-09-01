@@ -43,10 +43,10 @@ export const SignUpSchema = z
     path: ["passwordConfirmation"], // Associates the error with the confirmPassword field
   });
 
-export const AskQuestionSchema = z.object({
+export const PostSchema = z.object({
   title: z
     .string()
-    .min(5, { message: "Title is required." })
+    .min(5, { message: "Title is required. At least 5 characters" })
     .max(100, { message: "Title cannot exceed 100 characters." }),
 
   content: z.string().min(1, { message: "Body is required." }),
