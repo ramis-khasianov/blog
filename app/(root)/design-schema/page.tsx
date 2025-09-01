@@ -3,6 +3,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Sun } from "lucide-react";
 import React from "react";
+import PostForm from "@/components/forms/PostForm";
+import SignInForm from "@/components/forms/SignInForm";
+import SignUpForm from "@/components/forms/SignUpForm";
 
 const DesignSchema = () => {
   return (
@@ -79,6 +82,21 @@ const DesignSchema = () => {
           >
             Failure toast from bottom right
           </Button>
+        </div>
+      </div>
+
+      {/* Forms */}
+
+      <div className="w-full h-full border rounded p-6">
+        <div className="h2-bold mb-4">Post Form</div>
+        <PostForm />
+      </div>
+
+      <div className="w-full h-full border rounded p-6">
+        <div className="h2-bold mb-4">Sign Up and Sign in Form</div>
+        <div className="flex gap-4">
+          <SignInForm />
+          <SignUpForm />
         </div>
       </div>
     </div>

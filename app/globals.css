@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 /*
 creates a custom Tailwind variant called dark that applies styles when the element itself has class .dark, or any parent element has class .dark.
