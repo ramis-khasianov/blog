@@ -4,8 +4,6 @@ import React from "react";
 import { X } from "lucide-react";
 import { Badge } from "../ui/badge";
 
-import { Button } from "@/components/ui/button";
-
 interface Props {
   _id: string;
   name: string;
