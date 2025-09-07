@@ -37,17 +37,44 @@ export const signUpWithCredentials = async (
   /* Cast email to lowercase to be safe with some databases */
   const lowerCaseEmail = normalizeEmail(email);
 
+  /* Check if user already exists with social login */
+  const existingUser = await prisma.user.findUnique({
+    where: { email: lowerCaseEmail },
+    include: { accounts: true },
+  });
+
+  if (existingUser) {
+    const hasNonCredentialsAccount = existingUser.accounts.some(
+      account => account.provider !== "credentials"
+    );
+    
+    if (hasNonCredentialsAccount) {
+      return {
+        ok: false,
+        code: "ALREADY_EXISTS",
+        message: "Account exists. Please sign in with your social provider instead.",
+      };
+    }
+  }
+
   /* Try and create User in database */
   try {
     /* Hash password with 10 salt */
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    /* Create user on database */
+    /* Create user and credentials account on database */
     const user = await prisma.user.create({
       data: {
         email: lowerCaseEmail,
-        password: hashedPassword,
         name: name,
+        accounts: {
+          create: {
+            name: name,
+            password: hashedPassword,
+            provider: "credentials",
+            providerAccountId: lowerCaseEmail,
+          },
+        },
       },
     });
     console.log(`user created: ${user}`);
@@ -109,9 +136,16 @@ export const signInWithCredentials = async (
   /* Cast email to lowercase to be safe with some databases */
   const lowerCaseEmail = normalizeEmail(email);
 
-  /* Check if user actually exists. If it exists but has no password (or email) it means user is using other auth method and should either continue using it or add password at profile */
+  /* Check if user actually exists and has credentials account */
   const user = await prisma.user.findFirst({
     where: { email: lowerCaseEmail },
+    include: {
+      accounts: {
+        where: {
+          provider: "credentials",
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -122,7 +156,9 @@ export const signInWithCredentials = async (
     };
   }
 
-  if (!user.password || !user.email) {
+  const credentialsAccount = user.accounts.find(account => account.provider === "credentials");
+  
+  if (!credentialsAccount || !credentialsAccount.password || !user.email) {
     return {
       ok: false,
       code: "INVALID_AUTH_METHOD",

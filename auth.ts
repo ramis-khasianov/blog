@@ -26,20 +26,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         /* Destructure email and password */
         const { email, password } = validatedData.data;
 
-        /* Get user if user actually exists. If it exists but has no password (or email) it means user is using other auth method and should either continue using it or add password at profile */
+        /* Get user with their credentials account */
         const user = await prisma?.user.findFirst({
           where: {
             email: email.toLowerCase(),
           },
+          include: {
+            accounts: {
+              where: {
+                provider: "credentials",
+              },
+            },
+          },
         });
 
-        if (!user || !user.password || !user.email) {
+        if (!user || !user.email) {
+          return null;
+        }
+
+        /* Check if user has a credentials account with password */
+        const credentialsAccount = user.accounts.find(account => account.provider === "credentials");
+        
+        if (!credentialsAccount || !credentialsAccount.password) {
           return null;
         }
 
         /* Compare password with the one stored in database */
-
-        const passwordsMatch = await bcrypt.compare(password, user.password);
+        const passwordsMatch = await bcrypt.compare(password, credentialsAccount.password);
         if (!passwordsMatch) return null;
 
         /* Return the user data to Auth.js session */
