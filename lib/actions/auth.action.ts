@@ -69,7 +69,7 @@ export const signUpWithCredentials = async (
         name: name,
         accounts: {
           create: {
-            name: name,
+            type: "credentials",
             password: hashedPassword,
             provider: "credentials",
             providerAccountId: lowerCaseEmail,

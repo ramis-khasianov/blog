@@ -15,12 +15,13 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String?   @db.VarChar(255)
-  email     String    @unique @db.VarChar(255)
-  image     String?   @db.VarChar(255)
-  createdAt DateTime? @default(now()) @db.Timestamp(6)
-  updatedAt DateTime? @updatedAt @db.Timestamp(6)
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
   accounts Account[]
@@ -29,33 +30,40 @@ model User {
 }
 
 model Account {
-  id                Int     @id @default(autoincrement())
-  userId            Int
-  name              String  @db.VarChar(255)
-  image             String? @db.VarChar(255)
-  password          String? @db.VarChar(255)
-  provider          String  @db.VarChar(255)
-  providerAccountId String  @db.VarChar(255)
-  createdAt         DateTime @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime @updatedAt @db.Timestamp(6)
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  // Relations
+  // Custom field for credentials auth
+  password          String?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@id([provider, providerAccountId])
 }
 
 model Post {
   id        Int      @id @default(autoincrement())
   title     String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(255)
   content   String   @db.Text
   views     Int      @default(0)
   upvotes   Int      @default(0)
   downvotes Int      @default(0)
   published Boolean  @default(false)
-  authorId  Int
-  createdAt DateTime? @default(now()) @db.Timestamp(6)
-  updatedAt DateTime? @updatedAt @db.Timestamp(6)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -91,12 +99,13 @@ model Comment {
   content   String   @db.Text
   upvotes   Int      @default(0)
   downvotes Int      @default(0)
-  authorId  Int
+  authorId  String
   postId    Int
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
+
