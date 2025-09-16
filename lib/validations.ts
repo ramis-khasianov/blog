@@ -43,20 +43,45 @@ export const SignUpSchema = z
     path: ["passwordConfirmation"], // Associates the error with the confirmPassword field
   });
 
-export const PostSchema = z.object({
+export const CreatePostSchema = z.object({
   title: z
     .string()
     .min(5, { message: "Title is required. At least 5 characters" })
     .max(100, { message: "Title cannot exceed 100 characters." }),
 
   content: z.string().min(1, { message: "Body is required." }),
-  tags: z
+  summary: z
+    .string()
+    .max(1000, { message: "Summary cannot exceed 1000 characters." })
+    .optional(),
+  categories: z
     .array(
       z
         .string()
-        .min(1, { message: "Tag is required." })
-        .max(30, { message: "Tag cannot exceed 30 characters." })
+        .min(1, { message: "Category is required." })
+        .max(30, { message: "Category cannot exceed 30 characters." })
     )
-    .min(1, { message: "At least one tag is required." })
-    .max(3, { message: "Cannot add more than 3 tags." }),
+    .min(1, { message: "At least one category is required." })
+    .max(3, { message: "Cannot add more than 3 categories." }),
+  published: z.boolean().optional(),
+});
+
+export const EditPostSchema = CreatePostSchema.extend({
+  slug: z.string().min(1, { message: "Post slug is required." }),
+});
+
+export const GetPostSchema = z.object({
+  slug: z.string().min(1, { message: "Post slug is required." }),
+});
+
+export const PaginatedSearchParamsSchema = z.object({
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(10),
+  query: z.string().optional(),
+  filter: z.string().optional(),
+  sort: z.string().optional(),
+});
+
+export const IncrementViewsSchema = z.object({
+  postId: z.number().int().positive({ message: "Post ID is required." }),
 });

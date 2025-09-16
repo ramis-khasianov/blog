@@ -1,25 +1,29 @@
-import HomeFilter from "@/components/filters/HomeFilters";
 import LocalSearch from "@/components/search/LocalSearch";
 import PostCard from "@/components/cards/PostCard";
-import { posts } from "@/constants";
+import PostCardSmall from "@/components/cards/PostCardSmall";
+import { getPosts } from "@/lib/actions/post.action";
+import { EMPTY_POSTS } from "@/constants/states";
+import DataRenderer from "@/components/DataRenderer";
 
 interface SearchParams {
   searchParams: Promise<{ [key: string]: string }>;
 }
 
 export default async function Home({ searchParams }: SearchParams) {
-  const { query = "", filter = "" } = await searchParams;
+  const { page, pageSize, query, filter } = await searchParams;
 
-  const filteredPosts = posts.filter((post) => {
-    const matchesQuery =
-      post.title.toLowerCase().includes(query.toLowerCase()) ||
-      post.summary.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter
-      ? post.title.toLowerCase().includes(filter.toLowerCase()) ||
-        post.summary.toLowerCase().includes(filter.toLowerCase())
-      : true;
-    return matchesQuery && matchesFilter;
+  const { success, data, error } = await getPosts({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 12,
+    query: query || "",
+    filter: filter || "",
   });
+
+  const { posts } = data || {};
+
+  // Split posts for main and featured sections
+  const mainPosts = posts?.slice(0, 4) || [];
+  const featuredPosts = posts?.slice(4, 12) || [];
 
   return (
     <div className="flex flex-col justify-start items-center gap-8 w-full mx-auto">
@@ -46,15 +50,43 @@ export default async function Home({ searchParams }: SearchParams) {
         />
       </div>
 
-      <div>
-        <HomeFilter />
-      </div>
+      <DataRenderer
+        success={success}
+        error={error}
+        data={posts}
+        empty={EMPTY_POSTS}
+        render={() => (
+          <div className="mt-10 w-full max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Main Posts Section */}
+              <div className="lg:col-span-3">
+                <h2 className="text-2xl font-bold text-dark-100 dark:text-light-900 mb-6">
+                  Popular posts
+                </h2>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  {mainPosts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                </div>
+              </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPosts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
+              {/* Featured Posts Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-6">
+                  <h2 className="text-2xl font-bold text-dark-100 dark:text-light-900 mb-6">
+                    Featured Posts
+                  </h2>
+                  <div className="flex flex-col gap-4">
+                    {featuredPosts.map((post) => (
+                      <PostCardSmall key={`featured-${post.id}`} post={post} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      />
     </div>
   );
 }

@@ -13,16 +13,22 @@ interface Props {
   handleRemove?: () => void;
 }
 
-const TagCard = ({ name, compact, remove, isButton, handleRemove }: Props) => {
+const CategoryBadge = ({
+  name,
+  compact,
+  remove,
+  isButton,
+  handleRemove,
+}: Props) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
   };
 
   const Content = (
     <>
-      <Badge className="subtle-regular bg-light-700 dark:bg-dark-300 text-light-400 dark:text-light-500 flex flex-row gap-2 rounded-md border-none px-4 py-2 uppercase">
+      <Badge className=" bg-light-700 dark:bg-dark-300 text-light-400 dark:text-light-500 flex flex-row gap-2 rounded-md border-none px-3 py-1.5 uppercase">
         <div className="flex-center space-x-2">
-          <span>{name}</span>
+          <span className="body-regular">{name}</span>
         </div>
 
         {remove && (
@@ -49,4 +55,4 @@ const TagCard = ({ name, compact, remove, isButton, handleRemove }: Props) => {
   return Content;
 };
 
-export default TagCard;
+export default CategoryBadge;

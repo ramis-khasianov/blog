@@ -76,3 +76,23 @@
 .markdown-editor .cm-focused {
   outline: none;
 }
+
+/* Editor wrapper styling */
+.editor-wrapper {
+  min-height: 200px;
+  width: 100%;
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+  background-color: hsl(var(--background));
+}
+
+.editor-wrapper .markdown-editor {
+  min-height: 480px;
+  width: 100%;
+  border: none !important;
+  background-color: var(--color-light-700) !important;
+}
+
+.dark .editor-wrapper .markdown-editor {
+  background-color: var(--color-dark-300) !important;
+}

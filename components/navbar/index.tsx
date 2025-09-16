@@ -16,25 +16,33 @@ const Navbar = async () => {
       <SiteLogo />
       <NavLinks />
 
-      <div className="flex flex-between gap-2">
-        <ThemeToggle />
-        {session?.user ? (
-          <UserProfile session={session} />
-        ) : (
-          <div className=" items-center justify-center gap-2 ml-4 w-full hidden md:flex">
-            <Link href={ROUTES.SIGN_IN}>
-              <Button variant="secondary" className="w-full">
-                Sign In
-              </Button>
-            </Link>
-            <Link href={ROUTES.SIGN_UP}>
-              <Button variant="default" className="w-full">
-                Sign Up
-              </Button>
-            </Link>
-          </div>
+      <div className="flex flex-between gap-8">
+        {session?.user && (
+          <Button variant="default" asChild>
+            <Link href={"/new-post"}>New post</Link>
+          </Button>
         )}
-        <MobileNavigation />
+
+        <div className="flex flex-between gap-2">
+          <ThemeToggle />
+          {session?.user ? (
+            <UserProfile session={session} />
+          ) : (
+            <div className=" items-center justify-center gap-2 ml-4 w-full hidden md:flex">
+              <Link href={ROUTES.SIGN_IN}>
+                <Button variant="secondary" className="w-full">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href={ROUTES.SIGN_UP}>
+                <Button variant="default" className="w-full">
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          )}
+          <MobileNavigation />
+        </div>
       </div>
     </nav>
   );

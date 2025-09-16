@@ -57,6 +57,7 @@ model Post {
   title     String   @db.VarChar(255)
   slug      String   @unique @db.VarChar(255)
   content   String   @db.Text
+  summary   String?  @db.VarChar(1000)
   views     Int      @default(0)
   upvotes   Int      @default(0)
   downvotes Int      @default(0)
@@ -66,12 +67,12 @@ model Post {
   updatedAt DateTime @updatedAt
 
   // Relations
-  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  tags     PostTag[]
-  comments Comment[]
+  author     User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categories PostCategory[]
+  comments   Comment[]
 }
 
-model Tag {
+model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique @db.VarChar(100)
   postCount Int       @default(0)
@@ -79,19 +80,19 @@ model Tag {
   updatedAt DateTime  @updatedAt @db.Timestamp(6)
 
   // Relations
-  posts PostTag[]
+  posts PostCategory[]
 }
 
-model PostTag {
-  id     Int @id @default(autoincrement())
-  postId Int
-  tagId  Int
+model PostCategory {
+  id         Int @id @default(autoincrement())
+  postId     Int
+  categoryId Int
 
   // Relations
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@unique([postId, tagId])
+  @@unique([postId, categoryId])
 }
 
 model Comment {
