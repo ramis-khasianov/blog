@@ -3,6 +3,8 @@ const ROUTES = {
   SIGN_IN: "/sign-in",
   SIGN_UP: "/sign-up",
   NEW_POST: "/new-post",
+  MY_POSTS: "/my-posts",
+  ABOUT: "/about",
   POST: (slug: string) => `/posts/${slug}`,
   POST_EDIT: (slug: string) => `/posts/${slug}/edit`,
   AUTHOR: (id: string) => `/author/${id}`,

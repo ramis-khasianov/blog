@@ -6,7 +6,7 @@ import KeycloakAuthForm from "@/components/forms/KeycloakAuthForm";
 
 const page = () => {
   return (
-    <div className="min-w-100 max-w-180">
+    <div className="min-w-100 max-w-180 py-6">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign In</CardTitle>

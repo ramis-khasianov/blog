@@ -54,6 +54,19 @@ export const CreatePostSchema = z.object({
     .string()
     .max(1000, { message: "Summary cannot exceed 1000 characters." })
     .optional(),
+  featuredImage: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        // Accept URLs or local paths starting with /
+        return z.string().url().safeParse(val).success || val.startsWith("/");
+      },
+      {
+        message: "Featured image must be a valid URL or file path.",
+      }
+    ),
   categories: z
     .array(
       z
@@ -80,6 +93,7 @@ export const PaginatedSearchParamsSchema = z.object({
   query: z.string().optional(),
   filter: z.string().optional(),
   sort: z.string().optional(),
+  authorId: z.string().optional(),
 });
 
 export const IncrementViewsSchema = z.object({

@@ -17,16 +17,13 @@ import {
   ListsToggle,
   CreateLink,
   InsertImage,
-  InsertTable,
   InsertThematicBreak,
   InsertCodeBlock,
   linkPlugin,
   linkDialogPlugin,
-  tablePlugin,
   imagePlugin,
   codeBlockPlugin,
   codeMirrorPlugin,
-  diffSourcePlugin,
 } from "@mdxeditor/editor";
 import { basicDark } from "cm6-theme-basic-dark";
 import { useTheme } from "next-themes";
@@ -54,75 +51,72 @@ const Editor = ({ value, editorRef, fieldChange, ...props }: Props) => {
         ref={editorRef}
         className="markdown-editor dark-editor"
         onChange={fieldChange}
-      plugins={[
-        headingsPlugin(),
-        listsPlugin(),
-        linkPlugin(),
-        linkDialogPlugin(),
-        quotePlugin(),
-        thematicBreakPlugin(),
-        markdownShortcutPlugin(),
-        tablePlugin(),
-        imagePlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: "" }),
-        codeMirrorPlugin({
-          codeBlockLanguages: {
-            css: "css",
-            txt: "txt",
-            sql: "sql",
-            html: "html",
-            saas: "saas",
-            scss: "scss",
-            bash: "bash",
-            json: "json",
-            js: "javascript",
-            ts: "typescript",
-            "": "unspecified",
-            tsx: "TypeScript (React)",
-            jsx: "JavaScript (React)",
-          },
-          autoLoadLanguageSupport: true,
-          codeMirrorExtensions: theme,
-        }),
-        diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
-        toolbarPlugin({
-          toolbarContents: () => (
-            <ConditionalContents
-              options={[
-                {
-                  when: (editor) => editor?.editorType === "codeblock",
-                  contents: () => <ChangeCodeMirrorLanguage />,
-                },
-                {
-                  fallback: () => (
-                    <>
-                      <UndoRedo />
-                      <Separator />
+        plugins={[
+          headingsPlugin(),
+          listsPlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
+          quotePlugin(),
+          thematicBreakPlugin(),
+          markdownShortcutPlugin(),
+          imagePlugin(),
+          codeBlockPlugin({ defaultCodeBlockLanguage: "" }),
+          codeMirrorPlugin({
+            codeBlockLanguages: {
+              css: "css",
+              txt: "txt",
+              sql: "sql",
+              html: "html",
+              saas: "saas",
+              scss: "scss",
+              bash: "bash",
+              json: "json",
+              js: "javascript",
+              ts: "typescript",
+              "": "unspecified",
+              tsx: "TypeScript (React)",
+              jsx: "JavaScript (React)",
+            },
+            autoLoadLanguageSupport: true,
+            codeMirrorExtensions: theme,
+          }),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <ConditionalContents
+                options={[
+                  {
+                    when: (editor) => editor?.editorType === "codeblock",
+                    contents: () => <ChangeCodeMirrorLanguage />,
+                  },
+                  {
+                    fallback: () => (
+                      <>
+                        <UndoRedo />
+                        <Separator />
 
-                      <BoldItalicUnderlineToggles />
-                      <Separator />
+                        <BoldItalicUnderlineToggles />
+                        <Separator />
 
-                      <ListsToggle />
-                      <Separator />
+                        <ListsToggle />
+                        <Separator />
 
-                      <CreateLink />
-                      <InsertImage />
-                      <Separator />
+                        <CreateLink />
+                        <InsertImage />
+                        <Separator />
 
-                      <InsertTable />
-                      <InsertThematicBreak />
+                        <InsertThematicBreak />
 
-                      <InsertCodeBlock />
-                    </>
-                  ),
-                },
-              ]}
-            />
-          ),
-        }),
-      ]}
-      {...props}
-    />
+                        <InsertCodeBlock />
+                      </>
+                    ),
+                  },
+                ]}
+              />
+            ),
+          }),
+        ]}
+        {...props}
+      />
     </div>
   );
 };

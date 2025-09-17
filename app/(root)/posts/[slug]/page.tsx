@@ -12,6 +12,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { Clock, Eye, Edit } from "lucide-react";
+import Image from "next/image";
+import PublishToggle from "@/components/PublishToggle";
 import React from "react";
 
 export default async function PostDetails({
@@ -38,7 +40,16 @@ export default async function PostDetails({
     notFound();
   }
 
-  const { author, createdAt, categories, views, content, title } = post;
+  const {
+    author,
+    createdAt,
+    categories,
+    views,
+    content,
+    title,
+    featuredImage,
+    published,
+  } = post;
   const isAuthor = session?.user?.id === author.id;
 
   // Increment views after the page renders
@@ -66,23 +77,38 @@ export default async function PostDetails({
           </div>
 
           {isAuthor && (
-            <Link href={ROUTES.POST_EDIT(slug)}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Edit size={16} />
-                Edit Post
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <PublishToggle slug={slug} isPublished={published} />
+              <Link href={ROUTES.POST_EDIT(slug)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Edit size={16} />
+                  Edit Post
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
-        <h1 className="h2-semibold text-dark-200 dark:text-light-900 mt-3.5 w-full">
+        <h1 className="h1-bold text-dark-200 dark:text-light-900 mt-3.5 w-full">
           {title}
         </h1>
       </div>
+
+      {featuredImage && (
+        <div className="relative w-full h-64 md:h-80 lg:h-96 my-8 rounded-lg overflow-hidden">
+          <Image
+            src={featuredImage}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+            className="object-cover"
+          />
+        </div>
+      )}
 
       <div className="mb-8 mt-5 flex flex-wrap gap-4">
         <Metric
@@ -99,9 +125,7 @@ export default async function PostDetails({
         />
       </div>
 
-      <Preview content={content} />
-
-      <div className="mt-8 flex flex-wrap gap-2">
+      <div className="mb-8 flex flex-wrap gap-2">
         {categories.map((postCategory) => (
           <CategoryBadge
             key={postCategory.category.id}
@@ -111,6 +135,8 @@ export default async function PostDetails({
           />
         ))}
       </div>
+
+      <Preview content={content} />
     </div>
   );
 }

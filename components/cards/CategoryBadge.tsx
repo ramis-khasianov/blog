@@ -3,6 +3,7 @@ import React from "react";
 
 import { X } from "lucide-react";
 import { Badge } from "../ui/badge";
+import { cn } from "@/lib/utils";
 
 interface Props {
   _id: string;
@@ -11,6 +12,7 @@ interface Props {
   remove?: boolean;
   isButton?: boolean;
   handleRemove?: () => void;
+  className?: string;
 }
 
 const CategoryBadge = ({
@@ -19,6 +21,7 @@ const CategoryBadge = ({
   remove,
   isButton,
   handleRemove,
+  className,
 }: Props) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,9 +29,12 @@ const CategoryBadge = ({
 
   const Content = (
     <>
-      <Badge className=" bg-light-700 dark:bg-dark-300 text-light-400 dark:text-light-500 flex flex-row gap-2 rounded-md border-none px-3 py-1.5 uppercase">
+      <Badge className={cn(
+        "bg-light-700 dark:bg-dark-300 text-light-400 dark:text-light-500 flex flex-row gap-2 rounded-md border-none px-4 py-2 uppercase",
+        className
+      )}>
         <div className="flex-center space-x-2">
-          <span className="body-regular">{name}</span>
+          <span className="paragraph-regular">{name}</span>
         </div>
 
         {remove && (

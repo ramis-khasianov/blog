@@ -1,4 +1,5 @@
 import Navbar from "@/components/navbar";
+import Footer from "@/components/Footer";
 import React from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -8,6 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex min-h-screen flex-1 flex-col background-light850_dark100 px-6 pb-6 pt-36">
         {children}
       </div>
+      <Footer />
     </main>
   );
 };

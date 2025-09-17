@@ -51,10 +51,13 @@ const UserProfile = ({ session }: UserProfileProps) => {
           </div>
         </div>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push(ROUTES.MY_POSTS)}>
+          My Posts
+        </DropdownMenuItem>
         {/* <DropdownMenuItem onClick={() => router.push("/profile")}>
           Profile
-        </DropdownMenuItem>
-        <DropdownMenuSeparator /> */}
+        </DropdownMenuItem> */}
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} variant="destructive">
           Sign out
         </DropdownMenuItem>

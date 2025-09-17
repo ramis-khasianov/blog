@@ -9,13 +9,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
 const filters = [
-  { name: "Database", value: "database" },
+  { name: "Databases", value: "databases" },
   { name: "ETL", value: "etl" },
-
-  { name: "AI", value: "ai" },
   { name: "BI", value: "bi" },
-  { name: "Popular", value: "popular" },
-  { name: "Recommended", value: "recommended" },
+  { name: "Data Apps", value: "data-apps" },
 ];
 
 const HomeFilter = () => {

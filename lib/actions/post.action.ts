@@ -35,7 +35,7 @@ export async function createPost(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { title, content, summary, categories } = validationResult.params!;
+  const { title, content, summary, featuredImage, categories, published = false } = validationResult.params!;
   const userId = validationResult?.session?.user?.id;
 
   if (!userId) {
@@ -56,7 +56,8 @@ export async function createPost(
           slug: slug,
           content: content,
           summary: summary,
-          published: false,
+          featuredImage: featuredImage,
+          published: published,
           authorId: userId,
         },
       });
@@ -117,7 +118,7 @@ export async function editPost(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { title, content, summary, categories, slug, published } =
+  const { title, content, summary, featuredImage, categories, slug, published } =
     validationResult.params!;
   const userId = validationResult?.session?.user?.id;
 
@@ -163,6 +164,10 @@ export async function editPost(
 
       if (summary !== undefined && existingPost.summary !== summary) {
         updateData.summary = summary;
+      }
+
+      if (featuredImage !== undefined && existingPost.featuredImage !== featuredImage) {
+        updateData.featuredImage = featuredImage;
       }
 
       if (published !== undefined && existingPost.published !== published) {
@@ -308,14 +313,31 @@ export async function getPosts(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { page = 1, pageSize = 10, query, filter } = params;
+  const { page = 1, pageSize = 10, query, filter, authorId } = params;
   const skip = (Number(page) - 1) * pageSize;
   const limit = Number(pageSize);
 
   const filterQuery: Prisma.PostWhereInput = {};
 
+  // If authorId is provided, filter by author (for My Posts page)
+  if (authorId) {
+    filterQuery.authorId = authorId;
+  } else {
+    // For public pages, only show published posts
+    filterQuery.published = true;
+  }
+
   if (filter === "recommended") {
     return { success: true, data: { posts: [], isNext: false } };
+  }
+
+  // Additional filters for user's own posts
+  if (authorId) {
+    if (filter === "published") {
+      filterQuery.published = true;
+    } else if (filter === "draft") {
+      filterQuery.published = false;
+    }
   }
 
   if (query) {
@@ -323,6 +345,17 @@ export async function getPosts(
       { title: { contains: query, mode: "insensitive" } },
       { content: { contains: query, mode: "insensitive" } },
     ];
+  }
+
+  // Category filtering
+  if (filter && !["newest", "popular", "recommended", "published", "draft"].includes(filter)) {
+    filterQuery.categories = {
+      some: {
+        category: {
+          name: filter
+        }
+      }
+    };
   }
 
   let sortCriteria: Prisma.PostOrderByWithRelationInput = {};
@@ -363,6 +396,63 @@ export async function getPosts(
       success: true,
       data: { posts: JSON.parse(JSON.stringify(posts)), isNext },
     };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function togglePublishPost(
+  params: { slug: string }
+): Promise<ActionResponse<Post>> {
+  const validationResult = await action({
+    params,
+    schema: GetPostSchema,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { slug } = validationResult.params!;
+  const userId = validationResult?.session?.user?.id;
+
+  if (!userId) {
+    return handleError(
+      new Error("User ID not found in session")
+    ) as ErrorResponse;
+  }
+
+  try {
+    // First, get the current post to check ownership and current published status
+    const currentPost = await prisma.post.findUnique({
+      where: { slug },
+      select: { id: true, authorId: true, published: true },
+    });
+
+    if (!currentPost) {
+      throw new Error("Post not found");
+    }
+
+    if (currentPost.authorId !== userId) {
+      throw new Error("Unauthorized - you can only publish/unpublish your own posts");
+    }
+
+    // Toggle the published status
+    const updatedPost = await prisma.post.update({
+      where: { slug },
+      data: { published: !currentPost.published },
+      include: {
+        author: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    return { success: true, data: JSON.parse(JSON.stringify(updatedPost)) };
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }

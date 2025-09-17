@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["pino", "pino-pretty"],
+  transpilePackages: ["next-mdx-remote"],
   images: {
     remotePatterns: [
       {
@@ -11,7 +12,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https", 
+        protocol: "https",
         hostname: "avatars.githubusercontent.com",
         port: "",
         pathname: "/**",

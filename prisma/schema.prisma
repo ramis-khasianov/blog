@@ -53,18 +53,19 @@ model Account {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(255)
-  slug      String   @unique @db.VarChar(255)
-  content   String   @db.Text
-  summary   String?  @db.VarChar(1000)
-  views     Int      @default(0)
-  upvotes   Int      @default(0)
-  downvotes Int      @default(0)
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  title        String   @db.VarChar(255)
+  slug         String   @unique @db.VarChar(255)
+  content      String   @db.Text
+  summary      String?  @db.VarChar(1000)
+  featuredImage String? @db.VarChar(500)
+  views        Int      @default(0)
+  upvotes      Int      @default(0)
+  downvotes    Int      @default(0)
+  published    Boolean  @default(false)
+  authorId     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
   author     User           @relation(fields: [authorId], references: [id], onDelete: Cascade)

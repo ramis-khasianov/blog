@@ -1,6 +1,7 @@
 import LocalSearch from "@/components/search/LocalSearch";
 import PostCard from "@/components/cards/PostCard";
 import PostCardSmall from "@/components/cards/PostCardSmall";
+import HomeFilter from "@/components/filters/HomeFilters";
 import { getPosts } from "@/lib/actions/post.action";
 import { EMPTY_POSTS } from "@/constants/states";
 import DataRenderer from "@/components/DataRenderer";
@@ -12,18 +13,26 @@ interface SearchParams {
 export default async function Home({ searchParams }: SearchParams) {
   const { page, pageSize, query, filter } = await searchParams;
 
-  const { success, data, error } = await getPosts({
+  // Get popular posts (sorted by views)
+  const popularResult = await getPosts({
     page: Number(page) || 1,
-    pageSize: Number(pageSize) || 12,
+    pageSize: Number(pageSize) || 8,
     query: query || "",
-    filter: filter || "",
+    filter: filter || "popular",
   });
 
-  const { posts } = data || {};
+  // Get recent posts for featured section (sorted by newest)
+  // If category filter is active, apply it to featured posts too
+  const featuredResult = await getPosts({
+    page: 1,
+    pageSize: 4,
+    query: "",
+    filter: filter && !["newest", "popular", "recommended"].includes(filter) ? filter : "newest",
+  });
 
-  // Split posts for main and featured sections
-  const mainPosts = posts?.slice(0, 4) || [];
-  const featuredPosts = posts?.slice(4, 12) || [];
+  const { success, error } = popularResult;
+  const popularPosts = popularResult.data?.posts || [];
+  const featuredPosts = featuredResult.data?.posts || [];
 
   return (
     <div className="flex flex-col justify-start items-center gap-8 w-full mx-auto">
@@ -50,39 +59,48 @@ export default async function Home({ searchParams }: SearchParams) {
         />
       </div>
 
+      {/* Filters Section */}
+      <div className="w-full max-w-7xl mx-auto flex justify-center">
+        <HomeFilter />
+      </div>
+
       <DataRenderer
         success={success}
         error={error}
-        data={posts}
+        data={popularPosts}
         empty={EMPTY_POSTS}
         render={() => (
           <div className="mt-10 w-full max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className={`grid gap-8 ${query ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4"}`}>
               {/* Main Posts Section */}
-              <div className="lg:col-span-3">
+              <div className={query ? "col-span-1" : "lg:col-span-3"}>
                 <h2 className="text-2xl font-bold text-dark-100 dark:text-light-900 mb-6">
-                  Popular posts
+                  {query ? "Search results" : "Popular posts"}
                 </h2>
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  {mainPosts.map((post) => (
-                    <PostCard key={post.id} post={post} />
+                <div className="columns-1 xl:columns-2 gap-6 space-y-6">
+                  {popularPosts.map((post) => (
+                    <div key={post.id} className="break-inside-avoid mb-6">
+                      <PostCard post={post} />
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Featured Posts Sidebar */}
-              <div className="lg:col-span-1">
-                <div className="sticky top-6">
-                  <h2 className="text-2xl font-bold text-dark-100 dark:text-light-900 mb-6">
-                    Featured Posts
-                  </h2>
-                  <div className="flex flex-col gap-4">
-                    {featuredPosts.map((post) => (
-                      <PostCardSmall key={`featured-${post.id}`} post={post} />
-                    ))}
+              {/* Featured Posts Sidebar - Hidden when searching */}
+              {!query && (
+                <div className="lg:col-span-1">
+                  <div className="sticky top-6">
+                    <h2 className="text-2xl font-bold text-dark-100 dark:text-light-900 mb-6">
+                      Featured Posts
+                    </h2>
+                    <div className="flex flex-col gap-4">
+                      {featuredPosts.map((post) => (
+                        <PostCardSmall key={`featured-${post.id}`} post={post} />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}

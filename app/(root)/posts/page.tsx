@@ -1,5 +1,6 @@
 import LocalSearch from "@/components/search/LocalSearch";
 import PostCard from "@/components/cards/PostCard";
+import HomeFilter from "@/components/filters/HomeFilters";
 import { getPosts } from "@/lib/actions/post.action";
 import { EMPTY_POSTS } from "@/constants/states";
 import DataRenderer from "@/components/DataRenderer";
@@ -30,15 +31,22 @@ export default async function Posts({ searchParams }: SearchParams) {
         />
       </div>
 
+      {/* Filters Section */}
+      <div className="w-full max-w-7xl mx-auto flex justify-center">
+        <HomeFilter />
+      </div>
+
       <DataRenderer
         success={success}
         error={error}
         data={posts}
         empty={EMPTY_POSTS}
         render={(questions) => (
-          <div className="mt-10 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="mt-10 w-full columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
             {questions.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <div key={post.id} className="break-inside-avoid mb-6">
+                <PostCard post={post} />
+              </div>
             ))}
           </div>
         )}

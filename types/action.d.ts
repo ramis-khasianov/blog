@@ -2,6 +2,7 @@ interface CreatePostParams {
   title: string;
   content: string;
   summary?: string;
+  featuredImage?: string;
   categories: string[];
   published?: boolean;
 }

@@ -16,6 +16,7 @@ import { createPost, editPost } from "@/lib/actions/post.action";
 import { CreatePostSchema, EditPostSchema } from "@/lib/validations";
 
 import CategoryBadge from "../cards/CategoryBadge";
+import ImageUpload from "../ImageUpload";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -60,6 +61,7 @@ const PostForm = ({ post, isEdit = false }: Params) => {
       title: post?.title || "",
       content: post?.content || "",
       summary: post?.summary || "",
+      featuredImage: post?.featuredImage || "",
       categories: post?.categories?.map((postCategory) => postCategory.category.name) || [],
     },
   });
@@ -198,6 +200,28 @@ const PostForm = ({ post, isEdit = false }: Params) => {
         />
         <FormField
           control={form.control}
+          name="featuredImage"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold">
+                Featured Image
+              </FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  onRemove={() => field.onChange("")}
+                />
+              </FormControl>
+              <FormDescription className="body-regular mt-2.5 text-light-500">
+                Upload a featured image for your post. This will be displayed on post cards and at the top of your post.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="content"
           render={({ field }) => (
             <FormItem className="flex w-full flex-col">
@@ -257,44 +281,93 @@ const PostForm = ({ post, isEdit = false }: Params) => {
         />
 
         <div className="mt-16 flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={isPending}
-            className="w-fit"
-            onClick={() => {
-              const data = form.getValues();
-              handleSavePost(data, false);
-            }}
-          >
-            {isPending ? (
-              <>
-                <ReloadIcon className="mr-2 size-4 animate-spin" />
-                <span>Saving</span>
-              </>
-            ) : isEdit ? (
-              "Update Draft"
-            ) : (
-              "Save Draft"
-            )}
-          </Button>
+          {isEdit && post?.published ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isPending}
+                  className="w-fit"
+                >
+                  {isPending ? (
+                    <>
+                      <ReloadIcon className="mr-2 size-4 animate-spin" />
+                      <span>Saving</span>
+                    </>
+                  ) : (
+                    "Save as Draft"
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Unpublish this post?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will save your changes and unpublish the post. It will no longer be visible to readers until you publish it again.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      const data = form.getValues();
+                      handleSavePost(data, false);
+                    }}
+                  >
+                    Unpublish Post
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isPending}
+              className="w-fit"
+              onClick={() => {
+                const data = form.getValues();
+                handleSavePost(data, false);
+              }}
+            >
+              {isPending ? (
+                <>
+                  <ReloadIcon className="mr-2 size-4 animate-spin" />
+                  <span>Saving</span>
+                </>
+              ) : isEdit ? (
+                "Update Draft"
+              ) : (
+                "Save Draft"
+              )}
+            </Button>
+          )}
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button disabled={isPending}>
-                {isEdit ? "Update and Publish" : "Save and Publish"}
+                {isEdit 
+                  ? post?.published ? "Update Post" : "Update and Publish" 
+                  : "Save and Publish"}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   {isEdit
-                    ? "Update and publish your post?"
+                    ? post?.published 
+                      ? "Update your published post?"
+                      : "Update and publish your post?"
                     : "Are you ready to publish your post?"}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {isEdit
-                    ? "Your changes will be saved and the post will remain published."
+                    ? post?.published
+                      ? "Your changes will be saved and the post will remain published."
+                      : "Your changes will be saved and the post will be published for all users to see."
                     : "Your post will be published and available to all users. You can unpublish in my posts section at any time."}
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -306,7 +379,9 @@ const PostForm = ({ post, isEdit = false }: Params) => {
                     handleSavePost(data, true);
                   }}
                 >
-                  {isEdit ? "Update and Publish" : "Save and Publish"}
+                  {isEdit 
+                    ? post?.published ? "Update Post" : "Update and Publish" 
+                    : "Save and Publish"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

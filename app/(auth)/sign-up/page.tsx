@@ -18,7 +18,7 @@ const page = async () => {
   return (
     <div className="min-w-100 max-w-180">
       <div>
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-m py-6">
           <CardHeader>
             <CardTitle>Sign up</CardTitle>
           </CardHeader>

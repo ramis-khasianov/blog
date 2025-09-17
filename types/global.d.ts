@@ -22,7 +22,9 @@ interface Post {
   slug: string;
   content: string;
   summary?: string;
+  featuredImage?: string;
   published: boolean;
+  views: number;
   author: Author;
   createdAt: Date;
   categories: PostCategory[];
@@ -55,4 +57,5 @@ interface PaginatedSearchParams {
   query?: string;
   filter?: string;
   sort?: string;
+  authorId?: string;
 }
