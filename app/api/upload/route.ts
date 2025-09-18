@@ -1,8 +1,7 @@
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import crypto from "crypto";
 import handleError from "@/lib/handlers/error";
 
@@ -34,8 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate unique filename
-    const fileExtension = path.extname(file.name);
-    const fileName = `${crypto.randomUUID()}${fileExtension}`;
+    const fileName = `${crypto.randomUUID()}.jpg`;
     
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -52,33 +50,16 @@ export async function POST(request: NextRequest) {
       })
       .toBuffer();
 
-    // Create thumbnail
-    const thumbnailBuffer = await sharp(buffer)
-      .resize(400, 300, { 
-        fit: 'cover' 
-      })
-      .jpeg({ 
-        quality: 80 
-      })
-      .toBuffer();
-
-    // Save files
-    const uploadsDir = path.join(process.cwd(), "public/uploads/posts");
-    const imagePath = path.join(uploadsDir, fileName.replace(fileExtension, '.jpg'));
-    const thumbnailPath = path.join(uploadsDir, `thumb_${fileName.replace(fileExtension, '.jpg')}`);
-
-    await writeFile(imagePath, optimizedBuffer);
-    await writeFile(thumbnailPath, thumbnailBuffer);
-
-    // Return URLs
-    const imageUrl = `/uploads/posts/${fileName.replace(fileExtension, '.jpg')}`;
-    const thumbnailUrl = `/uploads/posts/thumb_${fileName.replace(fileExtension, '.jpg')}`;
+    // Upload to Vercel Blob
+    const blob = await put(`posts/${fileName}`, optimizedBuffer, {
+      access: 'public',
+      contentType: 'image/jpeg',
+    });
 
     return NextResponse.json({
       success: true,
       data: {
-        imageUrl,
-        thumbnailUrl,
+        imageUrl: blob.url,
         originalName: file.name,
         size: optimizedBuffer.length,
       }
